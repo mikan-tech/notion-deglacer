@@ -194,11 +194,10 @@ func unfurl(ev *slackevents.LinkSharedEvent) {
 			continue
 		}
 
-		title := page.PageTitle()
+		title := page.Properties.Title()
 		if title == "" {
 			log.Println("title is not found")
 		}
-		fmt.Println(title)
 
 		unfurls[link.URL] = slack.Attachment{
 			Title:     title,

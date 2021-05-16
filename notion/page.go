@@ -1,12 +1,42 @@
 package notion
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type Parent struct {
 	Type       string `json:"type"`
 	DatabaseID string `json:"database_id"`
 	PageID     string `json:"page_id"`
-	Workspace  bool   `json:"workspace"`
+}
+
+type Properties interface {
+	Title() string
+}
+
+type PageTypeProperties struct {
+	TitleValue TitlePropertyValue `json:"title"`
+}
+
+func (p PageTypeProperties) Title() string {
+	return p.TitleValue.Title[0].PlainText
+}
+
+type WorkSpaceTypeProperties struct {
+	TitleValue TitlePropertyValue `json:"title"`
+}
+
+func (w WorkSpaceTypeProperties) Title() string {
+	return w.TitleValue.Title[0].PlainText
+}
+
+//type DatabaseTypeProperties map[string]Properties
+
+type TitlePropertyValue struct {
+	Id    string     `json:"id"`
+	Type  string     `json:"type"`
+	Title []RichText `json:"title"`
 }
 
 type Page struct {
@@ -16,20 +46,35 @@ type Page struct {
 	LastEditedTime time.Time `json:"last_edited_time"`
 	Parent         Parent    `json:"parent"`
 	Archived       bool      `json:"archived"`
-	Properties     struct {
-		Title TitlePropertyValue `json:"title"`
-	} `json:"properties"`
+	Properties     Properties
 }
 
-type TitlePropertyValue struct {
-	Id    string     `json:"id"`
-	Type  string     `json:"type"`
-	Title []RichText `json:"title"`
-}
-
-func (p Page) PageTitle() string {
-	if p.Parent.Type == "page" || p.Parent.Type == "workspace" {
-		return p.Properties.Title.Title[0].PlainText
+func (p *Page) UnmarshalJSON(data []byte) error {
+	type Alias Page
+	a := &struct {
+		Properties json.RawMessage `json:"properties"`
+		*Alias
+	}{
+		Alias: (*Alias)(p),
 	}
-	return ""
+	if err := json.Unmarshal(data, &a); err != nil {
+		return err
+	}
+
+	switch p.Parent.Type {
+	case "workspace":
+		var properties WorkSpaceTypeProperties
+		if err := json.Unmarshal(a.Properties, &properties); err != nil {
+			return err
+		}
+		p.Properties = &properties
+	case "page_id":
+		var properties PageTypeProperties
+		if err := json.Unmarshal(a.Properties, &properties); err != nil {
+			return err
+		}
+		p.Properties = &properties
+	}
+
+	return nil
 }
