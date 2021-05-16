@@ -31,7 +31,19 @@ func (w WorkSpaceTypeProperties) Title() string {
 	return w.TitleValue.Title[0].PlainText
 }
 
-//type DatabaseTypeProperties map[string]Properties
+type DatabaseTypeProperties struct {
+	// TODO: since the key of the property changes dynamically,
+	// only getting the title property ad hoc.
+	TitleValue TitlePropertyValue
+}
+
+func (d DatabaseTypeProperties) Title() string {
+	if len(d.TitleValue.Title) == 0 {
+		return ""
+	}
+
+	return d.TitleValue.Title[0].PlainText
+}
 
 type TitlePropertyValue struct {
 	Id    string     `json:"id"`
@@ -73,6 +85,30 @@ func (p *Page) UnmarshalJSON(data []byte) error {
 		if err := json.Unmarshal(a.Properties, &properties); err != nil {
 			return err
 		}
+		p.Properties = &properties
+	case "database_id":
+		var data map[string]map[string]interface{}
+		var properties DatabaseTypeProperties
+		if err := json.Unmarshal(a.Properties, &data); err != nil {
+			return err
+		}
+		for _, val := range data {
+			if val["type"] == "title" {
+				var titleProperty TitlePropertyValue
+				js, err := json.Marshal(val)
+				if err != nil {
+					return err
+				}
+				err = json.Unmarshal(js, &titleProperty)
+				if err != nil {
+					return err
+				} else {
+					properties.TitleValue = titleProperty
+					break
+				}
+			}
+		}
+
 		p.Properties = &properties
 	}
 
