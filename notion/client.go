@@ -31,6 +31,17 @@ func (c Client) RetrievePage(pageId string) (*Page, error) {
 	return &page, nil
 }
 
+func (c Client) RetrieveDatabase(databaseId string) (*Database, error) {
+	requestPath := path.Join("v1/databases/" + databaseId)
+	var database Database
+	err := doNotionApi(c, requestPath, "GET", nil, &database)
+	if err != nil {
+		return nil, err
+	}
+
+	return &database, nil
+}
+
 // TODO
 //func (c Client) RetrieveBlockChildren(blockId string) (*BlockList, error) {
 //	requestPath := path.Join("v1/blocks/", blockId, "/children")
@@ -47,15 +58,15 @@ func (c Client) RetrievePage(pageId string) (*Page, error) {
 
 func doNotionApi(c Client, path string, method string, requestData interface{}, result interface{}) error {
 	uri := apiBaseUrl + path
-	var js []byte
+	var jsonObj []byte
 	var err error
 	if requestData != nil {
-		js, err = json.Marshal(requestData)
+		jsonObj, err = json.Marshal(requestData)
 		if err != nil {
 			return err
 		}
 	}
-	body := bytes.NewBuffer(js)
+	body := bytes.NewBuffer(jsonObj)
 
 	req, err := http.NewRequest(method, uri, body)
 	if err != nil {
@@ -76,8 +87,7 @@ func doNotionApi(c Client, path string, method string, requestData interface{}, 
 	var d []byte
 	d, _ = ioutil.ReadAll(rsp.Body)
 	if rsp.StatusCode != 200 {
-		js, _ = json.Marshal(d)
-		return fmt.Errorf("Error: status code %s\nBody:\n%s\n", rsp.Status, js)
+		return fmt.Errorf("Error: status code %s\nBody:\n%s\n", rsp.Status, d)
 	}
 	err = json.Unmarshal(d, result)
 	if err != nil {

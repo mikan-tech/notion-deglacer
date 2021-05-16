@@ -160,15 +160,22 @@ func unfurl(ev *slackevents.LinkSharedEvent) {
 		u.Fragment = ""
 		pageID := notionapi.ExtractNoDashIDFromNotionURL(u.String())
 
+		var title string
 		page, err := notionClient.RetrievePage(pageID)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
+		if err == nil {
+			title = page.Properties.Title()
+		} else {
+			log.Printf("RetrievePage Error: %s", err)
 
-		title := page.Properties.Title()
-		if title == "" {
-			log.Println("title is not found")
+			database, err := notionClient.RetrieveDatabase(pageID)
+			if err == nil {
+				fmt.Println(database.DatabaseTitle())
+				title = database.DatabaseTitle()
+			} else {
+				log.Printf("RetrieveDatabase Error: %s", err)
+
+				continue
+			}
 		}
 
 		// TODO: add Text Attachment contain the beginning of content
