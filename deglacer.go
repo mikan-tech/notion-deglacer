@@ -14,8 +14,8 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/MH4GF/notion-deglacer/notion"
 	"github.com/kjk/notionapi"
-	"github.com/kjk/notionapi/tomarkdown"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
 	"golang.org/x/sync/errgroup"
@@ -52,14 +52,16 @@ func Run(argv []string) error {
 }
 
 var (
-	notionClient       *notionapi.Client
+	oldNotionClient    *notionapi.Client
+	notionClient       *notion.Client
 	slackCli           *slack.Client
 	slackSigningSecret string
 )
 
 func initialize() error {
 	notionToken := os.Getenv("NOTION_TOKEN")
-	notionClient = &notionapi.Client{
+	oldNotionClient = &notionapi.Client{}
+	notionClient = &notion.Client{
 		AuthToken: notionToken,
 	}
 	slackSigningSecret = os.Getenv("SLACK_SIGNING_SECRET")
@@ -138,33 +140,6 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func get_text(page *notionapi.Page) string {
-	num_lines := 25
-	max_chars := 1000
-
-	md := string(tomarkdown.ToMarkdown(page))
-
-	lines := []string{}
-	for i, line := range strings.Split(md, "\n") {
-		// first two lines are a line for title and an empty line
-		if i != 0 && i != 1 {
-			lines = append(lines, line)
-		}
-
-		if len(lines) >= num_lines {
-			break
-		}
-	}
-	text := strings.Join(lines, "\n")
-
-	rs := []rune(text)
-	if len(rs) >= max_chars {
-		rs = rs[:max_chars]
-	}
-
-	return string(rs)
-}
-
 func unfurl(ev *slackevents.LinkSharedEvent) {
 	unfurls := make(map[string]slack.Attachment, len(ev.Links))
 
@@ -178,33 +153,36 @@ func unfurl(ev *slackevents.LinkSharedEvent) {
 			continue
 		}
 
+		// official notion api does not provide retrieving pageID
+		// because notionapi library is only used to extract pageID
 		// notionapi can't parse query parameter
 		u.RawQuery = ""
 		u.Fragment = ""
-
 		pageID := notionapi.ExtractNoDashIDFromNotionURL(u.String())
-		page, err := notionClient.DownloadPage(pageID)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
 
-		title := page.Root().Title
-		if title == "" {
-			title = page.Root().TableViews[0].Collection.GetName()
+		var title string
+		page, err := notionClient.RetrievePage(pageID)
+		if err == nil {
+			title = page.Properties.Title()
+		} else {
+			log.Printf("RetrievePage Error: %s", err)
 
-			if title == "" {
-				log.Println("title is not found")
+			database, err := notionClient.RetrieveDatabase(pageID)
+			if err == nil {
+				fmt.Println(database.DatabaseTitle())
+				title = database.DatabaseTitle()
+			} else {
+				log.Printf("RetrieveDatabase Error: %s", err)
+
 				continue
 			}
 		}
-		fmt.Println(title)
 
+		// TODO: add Text Attachment contain the beginning of content
 		unfurls[link.URL] = slack.Attachment{
 			Title:     title,
 			TitleLink: link.URL,
 			Footer:    "Notion",
-			Text:      get_text(page),
 		}
 	}
 

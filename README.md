@@ -12,23 +12,22 @@ NotionリンクをSlack上で展開してくれる君
 
 ## Description
 
-notino-deglacerはNotionのリンクがSlackに投稿された際に、それを展開してくれるSlack Appです。以下の機能を備えています。
+notion-deglacerはprivateなNotionリンクがSlackに投稿された際に、それを展開してくれるSlack Appです。以下の機能を備えています。
 
 - Notionの記事タイトル展開
   
-note: Notionの非公式なAPIクライアントを利用しています。Notion側が意図しない利用方法のため、リスクを承知の上利用してください。
-
 ## Installation
 
-1. Notionのアクセストークン取得
+1. Notion APIのIntegrationsをInternal integrationsで作成し、tokenを取得
 2. Slack App作成
 3. notion-deglacerのデプロイ
 4. 2で作ったappに、3のURLを登録する
 5. Slack Appのbotユーザーをチャンネルに招待する
+6. 展開したいページでIntegrationを許可する
 
-### 1. Notionアクセストークン取得
+### 1. Notion APIのIntegrationsをInternal integrationsで作成し、tokenを取得
 
-[この記事](https://presstige.io/p/Using-Notion-API-Go-client-2567fcfa8f7a4ed4bdf6f6ec9298d34a)の Accessing non-public pages を参考にしながらアクセストークンを取得してください。
+[Getting Started](https://developers.notion.com/docs/getting-started) を参考にしながらアクセストークンを取得してください。
 
 ### 2. Slack Appの作成
 
@@ -64,6 +63,14 @@ deglacerはGoで書かれたWebアプリケーションなので、任意の場�
 ### 5. Slack Appのbotをチャンネルに招待する
 
 Bot名は、左メニューのApp Homeから確認してください。
+
+### 6. 展開したいページでIntegrationを許可する 
+
+API経由でのアクセスをするためには、そのページでIntegrationを許可する必要があります。  
+![Grant Integrations](docs/grant-integration.png)
+
+現状ワークスペースレベルで全てのページを許可することはできないようです。  
+とはいえ親ページで許可をすれば子孫のページでも適用されるため、サイドバーの各ページで許可をすれば面倒ですが解決は可能です。  
 
 これで準備完了です。
 
