@@ -31,6 +31,20 @@ func (c Client) RetrievePage(pageId string) (*Page, error) {
 	return &page, nil
 }
 
+// TODO
+//func (c Client) RetrieveBlockChildren(blockId string) (*BlockList, error) {
+//	requestPath := path.Join("v1/blocks/", blockId, "/children")
+//	var blockList BlockList
+//
+//	// TODO: currently ignoring NextCursor even if it exists
+//	err := doNotionApi(c, requestPath, "GET", nil, &blockList)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return &blockList, nil
+//}
+
 func doNotionApi(c Client, path string, method string, requestData interface{}, result interface{}) error {
 	uri := apiBaseUrl + path
 	var js []byte

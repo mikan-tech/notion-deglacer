@@ -16,7 +16,6 @@ import (
 
 	"github.com/MH4GF/notion-deglacer/notion"
 	"github.com/kjk/notionapi"
-	"github.com/kjk/notionapi/tomarkdown"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
 	"golang.org/x/sync/errgroup"
@@ -141,33 +140,6 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func get_text(page *notionapi.Page) string {
-	num_lines := 25
-	max_chars := 1000
-
-	md := string(tomarkdown.ToMarkdown(page))
-
-	lines := []string{}
-	for i, line := range strings.Split(md, "\n") {
-		// first two lines are a line for title and an empty line
-		if i != 0 && i != 1 {
-			lines = append(lines, line)
-		}
-
-		if len(lines) >= num_lines {
-			break
-		}
-	}
-	text := strings.Join(lines, "\n")
-
-	rs := []rune(text)
-	if len(rs) >= max_chars {
-		rs = rs[:max_chars]
-	}
-
-	return string(rs)
-}
-
 func unfurl(ev *slackevents.LinkSharedEvent) {
 	unfurls := make(map[string]slack.Attachment, len(ev.Links))
 
@@ -199,11 +171,11 @@ func unfurl(ev *slackevents.LinkSharedEvent) {
 			log.Println("title is not found")
 		}
 
+		// TODO: add Text Attachment contain the beginning of content
 		unfurls[link.URL] = slack.Attachment{
 			Title:     title,
 			TitleLink: link.URL,
 			Footer:    "Notion",
-			//Text:      get_text(page),
 		}
 	}
 

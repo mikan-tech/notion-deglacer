@@ -95,11 +95,11 @@ func (p *Page) UnmarshalJSON(data []byte) error {
 		for _, val := range data {
 			if val["type"] == "title" {
 				var titleProperty TitlePropertyValue
-				js, err := json.Marshal(val)
+				jsonObj, err := json.Marshal(val)
 				if err != nil {
 					return err
 				}
-				err = json.Unmarshal(js, &titleProperty)
+				err = json.Unmarshal(jsonObj, &titleProperty)
 				if err != nil {
 					return err
 				} else {
