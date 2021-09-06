@@ -4,10 +4,10 @@ WORKDIR /go/src/project
 COPY . .
 RUN go get -d
 RUN go mod tidy
-RUN go build -ldflags=$(BUILD_LDFLAGS) -o bin/deglacer ./cmd/deglacer
+RUN CGO_ENABLED=0 GOOS=linux go build -o bin/deglacer ./cmd/deglacer
 
 # final stage
 FROM alpine:latest
 COPY --from=build /go/src/project/bin/deglacer /project/bin/deglacer
-EXPOSE 8000
+EXPOSE 8080
 ENTRYPOINT ["/project/bin/deglacer"]
