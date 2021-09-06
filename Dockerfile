@@ -2,7 +2,9 @@
 FROM golang:1.14 AS build
 WORKDIR /go/src/project
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o bin/deglacer ./cmd/deglacer
+RUN go get -d
+RUN go mod tidy
+RUN go build -ldflags=$(BUILD_LDFLAGS) -o bin/deglacer ./cmd/deglacer
 
 # final stage
 FROM alpine:latest
