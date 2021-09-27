@@ -9,6 +9,7 @@ deglacer
 [godoc]: https://godoc.org/github.com/MH4GF/notion-deglacer
 
 NotionリンクをSlack上で展開してくれる君
+![Usage](docs/usage.png)
 
 ## Description
 
