@@ -52,7 +52,6 @@ func Run(argv []string) error {
 }
 
 var (
-	oldNotionClient    *notionapi.Client
 	notionClient       *notion.Client
 	slackCli           *slack.Client
 	slackSigningSecret string
@@ -60,7 +59,9 @@ var (
 
 func initialize() error {
 	notionToken := os.Getenv("NOTION_TOKEN")
-	oldNotionClient = &notionapi.Client{}
+	if notionToken == "" {
+		return errors.New("env NOTION_TOKEN required")
+	}
 	notionClient = &notion.Client{
 		AuthToken: notionToken,
 	}
@@ -190,7 +191,7 @@ func unfurl(ev *slackevents.LinkSharedEvent) {
 		return
 	}
 
-	_, _, err := slackCli.PostMessage(ev.Channel, slack.MsgOptionUnfurl(ev.MessageTimeStamp.String(), unfurls))
+	_, _, err := slackCli.PostMessage(ev.Channel, slack.MsgOptionUnfurl(ev.MessageTimeStamp, unfurls))
 	if err != nil {
 		log.Println(err)
 	}
