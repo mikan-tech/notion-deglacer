@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: notion-degracer
+    env: go
+    repo: https://github.com/MH4GF/notion-deglacer.git
+    buildCommand: make build
+    startCommand: ./cmd/deglacer
+    envVars:
+      - key: SLACK_TOKEN
+        sync: false
+      - key: SLACK_SIGNING_SECRET
+        sync: false
+      - key: NOTION_TOKEN
+        sync: false

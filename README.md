@@ -49,17 +49,19 @@ notion-deglacerはprivateなNotionリンクがSlackに投稿された際に、�
 
 ### 3. deglacerのデプロイ
 
-deglacerはGoで書かれたWebアプリケーションなので、任意の場所で簡単に動かせますが、HerokuやGoogle App Engineを利用するのがより簡単でしょう。動作のためには以下の環境変数が必要です。
+deglacerはGoで書かれたWebアプリケーションなので、任意の場所で簡単に動かせますが、render.comやGoogle App Engineを利用するのがより簡単でしょう。動作のためには以下の環境変数が必要です。
 
 - `NOTION_TOKEN`: 手順1で取得したNotionのアクセストークン
 - `SLACK_TOKEN`: 手順2-5で取得したSlack Appのトークン
 - `SLACK_SIGNING_SECRET`: 手順2-6で取得したリクエスト署名検証secret
 
-#### Herokuで動かす場合
+#### renderで動かす場合
 
 以下のボタンからデプロイできます。
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/MH4GF/notion-deglacer)
+
+
 
 ### 4. 2で作ったappに、3のURLを登録する
 
