@@ -3,6 +3,7 @@ services:
     name: notion-degracer
     env: go
     repo: https://github.com/MH4GF/notion-deglacer.git
+    plan: free
     buildCommand: make build
     startCommand: ./cmd/deglacer
     envVars:
