@@ -1,8 +1,8 @@
 services:
   - type: web
-    name: notion-degracer
+    name: notion-deglacer
     env: go
-    repo: https://github.com/MH4GF/notion-deglacer.git
+    repo: https://github.com/mikan-tech/notion-deglacer.git
     plan: free
     buildCommand: make build
     startCommand: ./bin/deglacer

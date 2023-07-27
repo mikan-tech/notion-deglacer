@@ -16,7 +16,7 @@ NotionリンクをSlack上で展開してくれる君
 notion-deglacerはprivateなNotionリンクがSlackに投稿された際に、それを展開してくれるSlack Appです。以下の機能を備えています。
 
 - Notionの記事タイトル展開
-  
+
 ## Installation
 
 1. Notion APIのIntegrationsをInternal integrationsで作成し、tokenを取得
@@ -59,7 +59,7 @@ deglacerはGoで書かれたWebアプリケーションなので、任意の場�
 
 以下のボタンからデプロイできます。
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/MH4GF/notion-deglacer)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/mikan-tech/notion-deglacer)
 
 
 
@@ -72,20 +72,20 @@ deglacerはGoで書かれたWebアプリケーションなので、任意の場�
 
 Bot名は、左メニューのApp Homeから確認してください。
 
-### 6. 展開したいページでIntegrationを許可する 
+### 6. 展開したいページでIntegrationを許可する
 
-API経由でのアクセスをするためには、そのページでIntegrationを許可する必要があります。  
+API経由でのアクセスをするためには、そのページでIntegrationを許可する必要があります。
 ![Grant Integrations](docs/grant-integration.png)
 
-現状ワークスペースレベルで全てのページを許可することはできないようです。  
-とはいえ親ページで許可をすれば子孫のページでも適用されるため、サイドバーの各ページで許可をすれば面倒ですが解決は可能です。  
+現状ワークスペースレベルで全てのページを許可することはできないようです。
+とはいえ親ページで許可をすれば子孫のページでも適用されるため、サイドバーの各ページで許可をすれば面倒ですが解決は可能です。
 
 これで準備完了です。
 
 ## See Also
 
-notion-deglacerは[Songmu](https://github.com/Songmu)さんのリポジトリをフォークして作られています。    
-[https://github.com/Songmu/deglacer](https://github.com/Songmu/deglacer)  
+notion-deglacerは[Songmu](https://github.com/Songmu)さんのリポジトリをフォークして作られています。
+[https://github.com/Songmu/deglacer](https://github.com/Songmu/deglacer)
 Webサーバーの処理、Slackへの送信処理の大半をそのまま利用させていただいています。この場をお借りして御礼申し上げます。ありがとうございました！
 
 ## Author
