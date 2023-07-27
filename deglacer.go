@@ -145,7 +145,7 @@ func unfurl(ev *slackevents.LinkSharedEvent) {
 	unfurls := make(map[string]slack.Attachment, len(ev.Links))
 
 	for _, link := range ev.Links {
-		if !strings.HasSuffix(link.Domain, ".notion.so") {
+		if !strings.HasSuffix(link.Domain, "notion.so") {
 			continue
 		}
 		u, err := url.Parse(link.URL)
@@ -160,6 +160,7 @@ func unfurl(ev *slackevents.LinkSharedEvent) {
 		u.RawQuery = ""
 		u.Fragment = ""
 		pageID := notionapi.ExtractNoDashIDFromNotionURL(u.String())
+		fmt.Printf("requested page id: %q", pageID)
 
 		var title string
 		page, err := notionClient.RetrievePage(pageID)
