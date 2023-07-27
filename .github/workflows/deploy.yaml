@@ -1,0 +1,51 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-to-cloud-run:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - region: asia-northeast1
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version-file: go.mod
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          workload_identity_provider: ${{ secrets.CLOUD_RUN_DEPLOY_PROVIDER }}
+          service_account: ${{ secrets.CLOUD_RUN_DEPLOY_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v1
+
+      - uses: ko-build/setup-ko@v0.6
+      - name: Configure docker to use the gcloud cli
+        run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev --quiet
+
+      - name: Build and Deploy
+        env:
+          KO_DOCKER_REPO: asia-northeast1-docker.pkg.dev/${{ secrets.PROJECT_ID }}/notion-deglacer
+        run: |
+          gcloud run deploy notion-deglacer \
+            --region ${{ matrix.region }} \
+            --allow-unauthenticated \
+            --concurrency=default \
+            --cpu=1 \
+            --min-instances=0 \
+            --set-env-vars NOTION_TOKEN=${{ secrets.NOTION_TOKEN }} \
+            --set-env-vars SLACK_TOKEN=${{ secrets.SLACK_TOKEN }} \
+            --set-env-vars SLACK_SIGNING_SECRET=${{ secrets.SLACK_SIGNING_SECRET }} \
+            --image=$(ko build ./cmd/deglacer) \
+            --quiet
