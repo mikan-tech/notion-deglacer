@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/MH4GF/notion-deglacer"
+	deglacer "github.com/MH4GF/notion-deglacer"
 )
 
 func main() {
